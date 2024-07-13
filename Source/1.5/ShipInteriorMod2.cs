@@ -641,7 +641,12 @@ namespace SaveOurShip2
 					return check.RandomElement();
 				ships.Where(def => !def.neverAttacks && !def.neverRandom && (allowNavyExc || !def.navyExclusive)).RandomElement();
 			}
-			return null;
+            Log.Warning($"SOS2: found no suitable enemy ship at all, very final fallback, allowNavyExc: {allowNavyExc}, randomFleet: {randomFleet}");
+            // final_final_2_usethis.docx check: Prevents NRE attacking moonbase, should be almost never reached otherwise (min 5% of player CR)
+            check = ships.Where(def => ValidShipDef(def, 0.05f * CR, 100f * CR, tradeShip, allowNavyExc, randomFleet, 0, minZ, maxZ)).ToList();
+            if (check.Any())
+                return check.RandomElement();
+            return null;
 		}
 		public static bool ValidShipDef(ShipDef def, float CRmin, float CRmax, bool tradeShip, bool allowNavyExc, bool randomFleet, int rarity = 0, int minZ = 0, int maxZ = 0)
 		{
